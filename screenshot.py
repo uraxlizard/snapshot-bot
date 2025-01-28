@@ -13,9 +13,8 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class YouTubeSearchScreenshot:
-    def __init__(self, db_config, output_dir="screenshots"):
+    def __init__(self, db_config):
         self.base_url = "https://www.youtube.com/results"
-        self.output_dir = output_dir
         self.driver = None
         self.db_config = db_config
         self.records = []
@@ -183,11 +182,10 @@ class YouTubeSearchScreenshot:
                     self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
                     time.sleep(2)
     
-                    if output_dir is None:
-                        output_dir = self.default_output_dir
-
+                    output_dir = "/var/www/snapshots/public/screenshots"
                     if not os.path.exists(output_dir):
-                        os.makedirs(output_dir)
+                        logging.warning(f"No such output_path!")
+                        return None
                     
                     screenshot_path = os.path.join(output_dir, f"{record_id}_{self.timestamp}_screenshot.png")
                     try:
@@ -242,7 +240,6 @@ if __name__ == "__main__":
         scraper.setup_driver()
         scraper.fetch_prefix_from_db()
         scraper.fetch_records_from_db()
-        custom_output_dir = ""
         scraper.process_records()
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
