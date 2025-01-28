@@ -85,23 +85,26 @@ class YouTubeSearchScreenshot:
             conn = mariadb.connect(**self.db_config)
             cursor = conn.cursor()
 
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
             # Update the campaigns table
             update_campaign_query = """
             UPDATE campaigns
             SET 
                 snapshot = TRUE,
-                ranking_position = %s
+                ranking_position = %s,
+                updated_at = %s
             WHERE 
                 id = %s
             """
-            cursor.execute(update_campaign_query, (video_position, record_id))
+            cursor.execute(update_campaign_query, (video_position, current_time, record_id))
 
             # Insert into the snapshots table
             insert_snapshot_query = """
-            INSERT INTO snapshots (campaign_id, snapshot_file, ranking_position)
-            VALUES (%s, %s, %s)
+            INSERT INTO snapshots (campaign_id, snapshot_file, ranking_position, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_snapshot_query, (record_id, screenshot_path, video_position))
+            cursor.execute(insert_snapshot_query, (record_id, screenshot_path, video_position, current_time, current_time))
 
             conn.commit()
             cursor.close()
