@@ -20,6 +20,7 @@ class YouTubeSearchScreenshot:
         self.records = []
         self.prefix = ""
         self.video_position = ""
+        self.video_file_name = ""
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     def setup_driver(self):
@@ -79,7 +80,7 @@ class YouTubeSearchScreenshot:
         except mariadb.Error as e:
             logging.error(f"Error connecting to MariaDB: {e}")
             
-    def update_record_status(self, record_id, screenshot_path, video_position):
+    def update_record_status(self, record_id, video_position):
         """Update the record status to processed (TRUE) and set snapshot_url in the database."""
         try:
             conn = mariadb.connect(**self.db_config)
@@ -104,7 +105,7 @@ class YouTubeSearchScreenshot:
             INSERT INTO snapshots (campaign_id, snapshot_file, ranking_position, created_at, updated_at)
             VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_snapshot_query, (record_id, screenshot_path, video_position, current_time, current_time))
+            cursor.execute(insert_snapshot_query, (record_id, self.video_file_name, video_position, current_time, current_time))
 
             conn.commit()
             cursor.close()
@@ -196,6 +197,7 @@ class YouTubeSearchScreenshot:
                         return None
 
                     self.video_position = index
+                    self.video_file_name = f"{record_id}_{self.timestamp}_screenshot.png
     
                     return screenshot_path
             else:
@@ -224,7 +226,7 @@ class YouTubeSearchScreenshot:
             self.navigate_to_search_results(self.prefix + " " + search_query, geo_location)
             screenshot_path = self.search_and_screenshot(record_id, title)
             if screenshot_path:
-                self.update_record_status(record_id, screenshot_path, self.video_position)
+                self.update_record_status(record_id, self.video_position)
 
 if __name__ == "__main__":
     scraper = YouTubeSearchScreenshot(
