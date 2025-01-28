@@ -182,13 +182,15 @@ class YouTubeSearchScreenshot:
                     
                     self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
                     time.sleep(2)
-    
+                    
+                    dir_prefix = "screenshots"
                     output_dir = "/var/www/snapshots/public/screenshots"
                     if not os.path.exists(output_dir):
                         logging.warning(f"No such output_path!")
                         return None
                     
                     screenshot_path = os.path.join(output_dir, f"{record_id}_{self.timestamp}_screenshot.png")
+                    self.video_file_name = f"{dir_prefix}/{record_id}_{self.timestamp}_screenshot.png"
                     try:
                         self.driver.save_screenshot(screenshot_path)
                         logging.info(f"Screenshot saved at {screenshot_path}")
@@ -197,7 +199,7 @@ class YouTubeSearchScreenshot:
                         return None
 
                     self.video_position = index
-                    self.video_file_name = f"{record_id}_{self.timestamp}_screenshot.png
+                    
     
                     return screenshot_path
             else:
