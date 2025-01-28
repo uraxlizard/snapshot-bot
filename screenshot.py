@@ -111,7 +111,7 @@ class YouTubeSearchScreenshot:
             cursor.close()
             conn.close()
 
-            logging.info(f"Record with ID {record_id} updated in campaigns and inserted into snapshots with snapshot_url: {screenshot_path}.")
+            logging.info(f"Record with ID {record_id} updated in campaigns and inserted into snapshots with snapshot_url: {self.video_file_name}.")
         except mariadb.Error as e:
             logging.error(f"Error updating record ID {record_id}: {e}")
 
