@@ -183,10 +183,13 @@ class YouTubeSearchScreenshot:
                     self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
                     time.sleep(2)
     
-                    if not os.path.exists(self.output_dir):
-                        os.makedirs(self.output_dir)
+                    if output_dir is None:
+                        output_dir = self.default_output_dir
+
+                    if not os.path.exists(output_dir):
+                        os.makedirs(output_dir)
                     
-                    screenshot_path = os.path.join(self.output_dir, f"{record_id}_{self.timestamp}_screenshot.png")
+                    screenshot_path = os.path.join(output_dir, f"{record_id}_{self.timestamp}_screenshot.png")
                     try:
                         self.driver.save_screenshot(screenshot_path)
                         logging.info(f"Screenshot saved at {screenshot_path}")
@@ -239,6 +242,7 @@ if __name__ == "__main__":
         scraper.setup_driver()
         scraper.fetch_prefix_from_db()
         scraper.fetch_records_from_db()
+        custom_output_dir = ""
         scraper.process_records()
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
